@@ -1,0 +1,8 @@
+{
+    "name": "stratum",
+    "description": "<p>Would you like some millefeuille?</p>",
+    "flag": "KosenCTF{h4v3_fun_w17h_7h3_ugly_bu7_u53ful_SIMD_1n57ruc710n5}",
+    "author": "ptr-yudai",
+    "tags": ["reversing", "lunatic"],
+    "is_survey": false
+}

@@ -1,0 +1,278 @@
+#ifndef DIRECTIONAL_LIGHT_COUNT
+#define DIRECTIONAL_LIGHT_COUNT 0
+#endif
+#ifndef SPOT_LIGHT_COUNT
+#define SPOT_LIGHT_COUNT 0
+#endif
+#ifndef POINT_LIGHT_COUNT
+#define POINT_LIGHT_COUNT 0
+#endif
+#if (DIRECTIONAL_LIGHT_COUNT > 0) || (POINT_LIGHT_COUNT > 0) || (SPOT_LIGHT_COUNT > 0)
+#define LIGHTING
+#endif
+
+///////////////////////////////////////////////////////////
+// Atributes
+attribute vec4 a_position;
+
+#if defined(SKINNING)
+attribute vec4 a_blendWeights;
+attribute vec4 a_blendIndices;
+#endif
+
+attribute vec2 a_texCoord;
+
+#if defined(LIGHTMAP)
+attribute vec2 a_texCoord1; 
+#endif
+
+#if defined(LIGHTING)
+attribute vec3 a_normal;
+
+#if defined(BUMPED)
+attribute vec3 a_tangent;
+attribute vec3 a_binormal;
+#endif
+
+#endif
+
+///////////////////////////////////////////////////////////
+// Uniforms
+uniform mat4 u_worldViewProjectionMatrix;
+#if defined(SKINNING)
+uniform vec4 u_matrixPalette[SKINNING_JOINT_COUNT * 3];
+#endif
+
+#if defined(LIGHTING)
+uniform mat4 u_inverseTransposeWorldViewMatrix;
+
+#if defined(SPECULAR) || (POINT_LIGHT_COUNT > 0) || (SPOT_LIGHT_COUNT > 0)
+uniform mat4 u_worldViewMatrix;
+#endif
+
+#if defined(BUMPED) && (DIRECTIONAL_LIGHT_COUNT > 0)
+uniform vec3 u_directionalLightDirection[DIRECTIONAL_LIGHT_COUNT];
+#endif
+
+#if (POINT_LIGHT_COUNT > 0)
+uniform vec3 u_pointLightPosition[POINT_LIGHT_COUNT];
+#endif
+
+#if (SPOT_LIGHT_COUNT > 0) 
+uniform vec3 u_spotLightPosition[SPOT_LIGHT_COUNT];
+#if defined(BUMPED)
+uniform vec3 u_spotLightDirection[SPOT_LIGHT_COUNT];
+#endif
+#endif
+
+#if defined(SPECULAR)
+uniform vec3 u_cameraPosition;
+#endif
+
+#endif
+
+#if defined(TEXTURE_REPEAT)
+uniform vec2 u_textureRepeat;
+#endif
+
+#if defined(TEXTURE_OFFSET)
+uniform vec2 u_textureOffset;
+#endif
+
+#if defined(CLIP_PLANE)
+uniform mat4 u_worldMatrix;
+uniform vec4 u_clipPlane;
+#endif
+
+///////////////////////////////////////////////////////////
+// Varyings
+varying vec2 v_texCoord;
+
+#if defined(LIGHTMAP)
+varying vec2 v_texCoord1;
+#endif
+
+#if defined(LIGHTING)
+
+#if !defined(BUMPED)
+varying vec3 v_normalVector;
+#endif
+
+#if defined(BUMPED) && (DIRECTIONAL_LIGHT_COUNT > 0)
+varying vec3 v_directionalLightDirection[DIRECTIONAL_LIGHT_COUNT];
+#endif
+
+#if (POINT_LIGHT_COUNT > 0)
+varying vec3 v_vertexToPointLightDirection[POINT_LIGHT_COUNT];
+#endif
+
+#if (SPOT_LIGHT_COUNT > 0)
+varying vec3 v_vertexToSpotLightDirection[SPOT_LIGHT_COUNT];
+#if defined(BUMPED)
+varying vec3 v_spotLightDirection[SPOT_LIGHT_COUNT];
+#endif
+#endif
+
+#if defined(SPECULAR)
+varying vec3 v_cameraDirection;
+#endif
+
+
+#if defined(BUMPED)
+void applyLight(vec4 position, mat3 tangentSpaceTransformMatrix)
+{
+    #if (defined(SPECULAR) || (POINT_LIGHT_COUNT > 0) || (SPOT_LIGHT_COUNT > 0))
+    vec4 positionWorldViewSpace = u_worldViewMatrix * position;
+    #endif
+    
+    #if (DIRECTIONAL_LIGHT_COUNT > 0)
+    for (int i = 0; i < DIRECTIONAL_LIGHT_COUNT; ++i)
+    {
+        // Transform light direction to tangent space
+        v_directionalLightDirection[i] = tangentSpaceTransformMatrix * u_directionalLightDirection[i];
+    }
+    #endif
+    
+    #if (POINT_LIGHT_COUNT > 0)
+    for (int i = 0; i < POINT_LIGHT_COUNT; ++i)
+    {
+        // Compute the vertex to light direction, in tangent space
+        v_vertexToPointLightDirection[i] = tangentSpaceTransformMatrix * (u_pointLightPosition[i] - positionWorldViewSpace.xyz);
+    }
+    #endif
+    
+    #if (SPOT_LIGHT_COUNT > 0)
+    for (int i = 0; i < SPOT_LIGHT_COUNT; ++i)
+    {
+        // Compute the vertex to light direction, in tangent space
+	    v_vertexToSpotLightDirection[i] = tangentSpaceTransformMatrix * (u_spotLightPosition[i] - positionWorldViewSpace.xyz);
+        v_spotLightDirection[i] = tangentSpaceTransformMatrix * u_spotLightDirection[i];
+    }
+    #endif
+    
+    #if defined(SPECULAR)
+    // Compute camera direction and transform it to tangent space.
+    v_cameraDirection = tangentSpaceTransformMatrix * (u_cameraPosition - positionWorldViewSpace.xyz);
+    #endif
+}
+#else
+void applyLight(vec4 position)
+{
+    #if defined(SPECULAR) || (POINT_LIGHT_COUNT > 0) || (SPOT_LIGHT_COUNT > 0)
+	vec4 positionWorldViewSpace = u_worldViewMatrix * position;
+    #endif
+
+    #if (POINT_LIGHT_COUNT > 0)
+    for (int i = 0; i < POINT_LIGHT_COUNT; ++i)
+    {
+        // Compute the light direction with light position and the vertex position.
+        v_vertexToPointLightDirection[i] = u_pointLightPosition[i] - positionWorldViewSpace.xyz;
+    }
+    #endif
+
+    #if (SPOT_LIGHT_COUNT > 0)
+    for (int i = 0; i < SPOT_LIGHT_COUNT; ++i)
+    {
+        // Compute the light direction with light position and the vertex position.
+	    v_vertexToSpotLightDirection[i] = u_spotLightPosition[i] - positionWorldViewSpace.xyz;
+    }
+    #endif
+
+    #if defined(SPECULAR)  
+	v_cameraDirection = u_cameraPosition - positionWorldViewSpace.xyz;
+    #endif
+}
+
+#endif
+
+
+#endif
+
+#if defined(SKINNING)
+
+vec4 _skinnedPosition;
+
+void skinPosition(float blendWeight, int matrixIndex)
+{
+    vec4 tmp;
+    tmp.x = dot(a_position, u_matrixPalette[matrixIndex]);
+    tmp.y = dot(a_position, u_matrixPalette[matrixIndex + 1]);
+    tmp.z = dot(a_position, u_matrixPalette[matrixIndex + 2]);
+    tmp.w = a_position.w;
+    _skinnedPosition += blendWeight * tmp;
+}
+
+vec4 getPosition()
+{
+    _skinnedPosition = vec4(0.0);
+    float blendWeight = a_blendWeights[0];
+    int matrixIndex = int (a_blendIndices[0]) * 3;
+    skinPosition(blendWeight, matrixIndex);
+    blendWeight = a_blendWeights[1];
+    matrixIndex = int(a_blendIndices[1]) * 3;
+    skinPosition(blendWeight, matrixIndex);
+    blendWeight = a_blendWeights[2];
+    matrixIndex = int(a_blendIndices[2]) * 3;
+    skinPosition(blendWeight, matrixIndex);
+    blendWeight = a_blendWeights[3];
+    matrixIndex = int(a_blendIndices[3]) * 3;
+    skinPosition(blendWeight, matrixIndex);
+    return _skinnedPosition;    
+}
+
+#if defined(LIGHTING)
+
+vec3 _skinnedNormal;
+
+void skinTangentSpaceVector(vec3 vector, float blendWeight, int matrixIndex)
+{
+    vec3 tmp;
+    tmp.x = dot(vector, u_matrixPalette[matrixIndex].xyz);
+    tmp.y = dot(vector, u_matrixPalette[matrixIndex + 1].xyz);
+    tmp.z = dot(vector, u_matrixPalette[matrixIndex + 2].xyz);
+    _skinnedNormal += blendWeight * tmp;
+}
+
+vec3 getTangentSpaceVector(vec3 vector)
+{
+    _skinnedNormal = vec3(0.0);
+    // Transform normal to view space using matrix palette with four matrices used to transform a vertex.
+    float blendWeight = a_blendWeights[0];
+    int matrixIndex = int (a_blendIndices[0]) * 3;
+    skinTangentSpaceVector(vector, blendWeight, matrixIndex);
+    blendWeight = a_blendWeights[1];
+    matrixIndex = int(a_blendIndices[1]) * 3;
+    skinTangentSpaceVector(vector, blendWeight, matrixIndex);
+    blendWeight = a_blendWeights[2];
+    matrixIndex = int(a_blendIndices[2]) * 3;
+    skinTangentSpaceVector(vector, blendWeight, matrixIndex);
+    blendWeight = a_blendWeights[3];
+    matrixIndex = int(a_blendIndices[3]) * 3;
+    skinTangentSpaceVector(vector, blendWeight, matrixIndex);
+    return _skinnedNormal;
+}
+
+vec3 getNormal()
+{
+    return getTangentSpaceVector(a_normal);
+}
+
+#if defined(BUMPED)
+
+vec3 getTangent()
+{
+    return getTangentSpaceVector(a_tangent);
+}
+
+vec3 getBinormal()
+{
+    return getTangentSpaceVector(a_binormal);
+}
+
+#endif
+
+#endif
+
+
+#else
+

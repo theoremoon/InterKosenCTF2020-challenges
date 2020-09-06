@@ -1,0 +1,8 @@
+{
+    "name": "Welcome",
+    "description": "Welcome to InterKosenCTF 2020! All announcement, support, and the welcome flag are available in <a href=\"https://discord.gg/vs39DfA\" target=\"_blank\">our Discord</a>.",
+    "flag": "KosenCTF{w31c0m3_and_13ts_3nj0y_the_party!!}",
+    "author": "insecure",
+    "tags": ["welcome"],
+    "is_survey": false
+}

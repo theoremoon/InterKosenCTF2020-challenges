@@ -1,0 +1,8 @@
+{
+    "name": "ciphertexts",
+    "description": "Since there are two ciphertexts, it is easy to solve, isn't it?",
+    "flag": "KosenCTF{HALDYN_D0M3}",
+    "author": "theoremoon",
+    "tags": ["crypto", "warmup"],
+    "is_survey": false
+}

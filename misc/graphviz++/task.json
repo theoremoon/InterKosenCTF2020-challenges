@@ -1,0 +1,10 @@
+{
+    "name": "graphviz++",
+    "description": "<p>Make <a href=\"http://${host}:${port}/\" target=\"_blank\">graphviz</a> great again!</p>",
+    "flag": "KosenCTF{1nt3rpr3t1ng_dur1ng_pr0c3ss1ng}",
+    "author": "ptr-yudai",
+    "tags": ["misc", "web"],
+    "host": "misc.kosenctf.com",
+    "port": 10001,
+    "is_survey": false
+}

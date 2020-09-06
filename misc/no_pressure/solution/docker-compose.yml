@@ -1,0 +1,6 @@
+version: "3"
+services:
+  solve:
+    build:
+      context: .
+    command: python solve.py

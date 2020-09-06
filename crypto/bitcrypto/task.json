@@ -1,0 +1,10 @@
+{
+    "name": "bitcrypto",
+    "description": "Yoshiking, the master of bit crypto, has the flag. Ask him for the flag.<br><pre>nc ${host} ${port}</pre>",
+    "flag": "KosenCTF{yoshiking_is_clever_and_wild_god_of_crypt}",
+    "author": "theoremoon",
+    "tags": ["crypto"],
+    "host": "crypto.kosenctf.com",
+    "port": 13003,
+    "is_survey": false
+}

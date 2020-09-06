@@ -1,0 +1,10 @@
+{
+    "name": "Fables of aeSOP",
+    "description": "<pre>nc ${host} ${port}</pre>",
+    "flag": "KosenCTF{FS0P_1s_s1mpl3_4nd_fun!}",
+    "author": "ptr-yudai",
+    "tags": ["pwn"],
+    "host": "pwn.kosenctf.com",
+    "port": 9003,
+    "is_survey": false
+}

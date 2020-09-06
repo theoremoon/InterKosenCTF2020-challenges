@@ -1,0 +1,6 @@
+version: '3'
+services:
+  no_pressure:
+    build: ./
+    ports:
+      - 10002:10002

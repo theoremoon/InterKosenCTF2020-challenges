@@ -1,0 +1,10 @@
+version: '3'
+services:
+  pash:
+    build:
+      context: .
+    working_dir: /home/pwn
+    container_name: pash
+    ports:
+      - "9022:22"
+    entrypoint: ["/usr/sbin/sshd", "-D"]

@@ -1,0 +1,8 @@
+{
+  "name": "trilemma",
+  "description": "<p>Citizen fears emperor.<br>Slave fears citizen.<br>Emperor fears slave.</p>",
+  "flag": "KosenCTF{emperor_wins_with_a_probability_of_four-fifths}",
+  "author": "ptr-yudai",
+  "tags": ["reversing"],
+  "is_survey": false
+}

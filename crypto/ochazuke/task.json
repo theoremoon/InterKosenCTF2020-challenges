@@ -1,0 +1,10 @@
+{
+    "name": "ochazuke",
+    "description": "<pre>nc ${host} ${port}</pre>",
+    "flag": "KosenCTF{ahhhh_ochazuke_oisi_geho!geho!!gehun!..oisii...}",
+    "author": "yoshiking",
+    "tags": ["crypto"],
+    "host": "crypto.kosenctf.com",
+    "port": 13005,
+    "is_survey": false
+}

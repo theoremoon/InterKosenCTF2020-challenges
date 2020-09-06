@@ -1,0 +1,8 @@
+{
+    "name": "in question",
+    "description": "???",
+    "flag": "KosenCTF{d0nt_l3t_th4t_f00l_u}",
+    "author": "ptr-yudai",
+    "tags": ["reversing", "warmup"],
+    "is_survey": false
+}

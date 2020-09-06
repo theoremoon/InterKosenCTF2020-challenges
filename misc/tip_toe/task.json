@@ -1,0 +1,8 @@
+{
+    "name": "Tip Toe",
+    "description": "<p>Fall Bozos: Ultimate KosenCTF<br><small>The timer is of integer type.</small></p>",
+    "flag": "KosenCTF{Let's_play_a_game_other_than_CTF}",
+    "author": "ptr-yudai",
+    "tags": ["misc", "cheat"],
+    "is_survey": false
+}

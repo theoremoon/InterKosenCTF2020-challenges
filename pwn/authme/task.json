@@ -1,0 +1,10 @@
+{
+    "name": "authme",
+    "description": "<pre>nc ${host} ${port}</pre>",
+    "flag": "KosenCTF{cl0s3_ur_3y3_4nd_g0_w1th_th3_fl0w}",
+    "author": "ptr-yudai",
+    "tags": ["pwn"],
+    "host": "pwn.kosenctf.com",
+    "port": 9002,
+    "is_survey": false
+}

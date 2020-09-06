@@ -1,0 +1,8 @@
+{
+  "name": "harmagedon",
+  "description": "WTF of the large data!<br><small>Enclose the flag with <code>KosenCTF{}</code></small>",
+  "flag": "KosenCTF{Ruktun0rDi3}",
+  "author": "theoremoon",
+  "tags": ["reversing"],
+  "is_survey": false
+}

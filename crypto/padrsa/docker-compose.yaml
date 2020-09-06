@@ -1,0 +1,6 @@
+version: '3'
+services:
+  padrsa:
+    build: ./
+    ports:
+      - 13001:13001

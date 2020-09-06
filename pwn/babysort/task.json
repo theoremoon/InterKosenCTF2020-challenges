@@ -1,0 +1,10 @@
+{
+    "name": "babysort",
+    "description": "<pre>nc ${host} ${port}</pre>",
+    "flag": "KosenCTF{f4k3_p01nt3r_l34ds_u_2_w1n}",
+    "author": "ptr-yudai",
+    "tags": ["pwn", "warmup"],
+    "host": "pwn.kosenctf.com",
+    "port": 9001,
+    "is_survey": false
+}

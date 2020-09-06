@@ -1,0 +1,309 @@
+#packopt hide 1
+#packopt name "tiptoe"
+
+/* anti-decompiler flag generator */
+#module modflag _
+	#modinit str p1, str p5, str p6
+		r = ginfo_r : g = ginfo_g : b = ginfo_b
+		sdim p2, 4
+		sdim p3, 1
+		sdim p4, 4
+		rgbcolor 0x616c79
+		a = ginfo_g : b = ginfo_b
+		lpoke p2, 0, ginfo_b * 0x1000000 + ginfo_r * 0x10000 + ginfo_g * 0x100 + 0x70
+		poke p3, 0, ginfo_r
+		rgbcolor 0x67616d
+		lpoke p4, 0, 0x65000000 + ginfo_b * 0x10000 + ginfo_g * 0x100 + ginfo_r
+		rgbcolor 0x435446
+		p7 = ginfo_r : p8 = ginfo_g : p9 = ginfo_b
+		color r, g, b
+		mes strf("KosenCTF{%s_%s_%s_%s_%s_%s_%c%c%c}", p1, p2, p3, p4, p5, p6, p7, p8, p9)
+		rgbcolor 0xdeadbe
+		return
+#global
+
+#include "hgimg4.as"
+
+	setreq SYSREQ_LOGWRITE, 0
+	title "Tamane Tip Toe"
+	randomize
+
+	/* Initialize hgimg4 */
+	gpreset
+	setcls CLSMODE_SOLID, 0xf080a0	// background color
+	setcolor GPOBJ_LIGHT, 1,1,1		// light color
+	setdir GPOBJ_LIGHT, 0.5,0.5,0.5	// ambient color
+
+	celload "res/text_eliminated.png", 4
+	celload "res/text_qualified.png", 5
+	buffer 1, ginfo_sx, ginfo_sy, screen_offscreen + screen_usergcopy
+
+	GROUP_FLOOR = 1
+	GROUP_PLAYER = 2
+	s = dir_cmdline
+	s = strtrim(s, 0, ' ')
+	if s == "debug" {
+		is_debug = 1
+		dialog "argv[1]='debug' : debug mode activated", 0, "Developer Mode"
+	} else {
+		is_debug = 0
+	}
+
+	/* Initialize stage */
+	camera_r = 16.0
+	player_x = 0.0
+	player_z = -20.0
+	player_t = 0.0
+	delta_x = 0.0
+	delta_y = 0.0
+	camera_t = player_t
+	player_speed = 12.0
+	player_animation = 0
+	player_isjump = 0
+	player_ismove = 0
+	gameover = 0
+	gosub *INIT_STAGE
+
+	time = 0
+/* Main loop of the game */
+*MAINLOOP
+	/* Draw and caluculate in virtual buffer */
+	gosub *RECV_INPUT
+	gosub *COLLISION
+
+	gsel 1
+	redraw 0
+	gosub *UPDATE_OBJ
+
+	gpdraw
+	redraw 1
+
+	/* Draw in real buffer */
+	gsel 0
+	redraw 0
+	// copy 3d scene
+	gmode 0
+	pos 0, 0 : celput 1
+
+	if is_debug {
+		pos 16, 16 : color 0, 0, 0
+		mes strf("(px, py, pz) = (%f, %f, %f)", player_x, player_y, player_z)
+		mes strf("(cx, cy, cz) = (%f, %f, %f)", camera_x, 10.0, camera_z)
+		mes strf("(dx, dz) = (%f, %f)", delta_x, delta_z)
+		mes strf("animation = %d", player_animation)
+		mes strf("time = %f", time)
+	}
+	if gameover == 1 {
+		pos ginfo_sx / 2 - 268, ginfo_sy / 2 - 45
+		gmode 2
+		gcopy 4, 0, 0, 537, 90
+	} else: if gameover == 2 {
+		pos ginfo_sx / 2 - 240, ginfo_sy / 2 - 45
+		gmode 2
+		gcopy 5, 0, 0, 480, 90
+		pos ginfo_sx / 2 - 160, ginfo_sy / 2 + 60 : color 80, 240, 80
+		if time < 100 {
+			newmod flag, modflag, "Let's", "other", "than"
+			delmod flag
+		} else {
+			mes "Tips: Finish more quickly to get the flag!"
+		}
+	}
+	redraw 1
+	await 1000/60
+	if gameover == 0: time++
+	goto *MAINLOOP
+
+/* Collision check */
+*COLLISION
+	/* Collision with floor */
+	getcoli victim, player_foot_id, 3.0
+	if victim != -1 {
+		repeat 10
+			y = cnt
+			repeat 10
+				if maze_id(y, cnt) == victim {
+					// collide!
+					if maze_solid(y, cnt) == 0 {
+						// not solid!
+						gppbind maze_id(y, cnt), 1.0, 0.0
+					} else {
+						// solid!
+						delobj maze_id(y, cnt)
+						maze_id(y, cnt) = -1
+						gpbox id, 4.8, 0xf0f080
+						setscale id, 1.0, 0.1, 1.0
+						setcoli id, GROUP_FLOOR
+						setpos id, -22.0 + cnt * 5, -0.25, -12.0 + y * 5
+					}
+				}
+			loop
+		loop
+	}
+
+	return
+
+/* Calculate & update objects */
+*UPDATE_OBJ
+	/* Update player */
+	getpos player_foot_id, x, player_y, z
+	delta_x = x - player_x
+	delta_z = z - player_z
+	player_x = x
+	player_z = z
+	setpos player_id, player_x, player_y - 1.0, player_z
+	setang player_id, 0, player_t
+	setang player_foot_id, 0, player_t
+	if player_isjump == 1 && player_y > 1.2 {
+		player_isjump = 2
+	}
+	if player_isjump == 2 && player_y < 1.2 {
+		player_isjump = 0
+		gpact player_id, "stop", 1
+		player_animation = 0
+	}
+	if player_ismove == 1 {
+		if player_isjump == 0 {
+			gppapply player_foot_id, GPPAPPLY_FORCE, player_speed * sin(player_t), 0.0, player_speed * cos(player_t)
+		}
+		delta = delta_x * delta_x + delta_z * delta_z
+		gppapply player_foot_id, GPPAPPLY_FORCE, delta * sin(player_t + M_PI), 0.0, delta * cos(player_t + M_PI)
+	} else: if player_isjump == 0 {
+		gppapply player_foot_id, GPPAPPLY_FORCE, 0.0, -10.0, 0.0
+	}
+
+	/* Gameover */
+	if player_y < -5.0 && gameover == 0 {
+		gppset player_foot_id, GPPSET_ENABLE, 0
+		setalpha player_id, 0.0
+		gameover = 1
+	}
+	if player_z > 35.0 && gameover == 0 {
+		gppset player_foot_id, GPPSET_ENABLE, 0
+		setalpha player_id, 0.0
+		gameover = 2
+	}
+
+	/* Update camera */
+	camera_x = player_x - camera_r * sin(camera_t)
+	camera_z = player_z - camera_r * cos(camera_t)
+	setpos GPOBJ_CAMERA, camera_x, 8, camera_z
+	gplookat GPOBJ_CAMERA, player_x, 3.0 + player_y, player_z
+
+	return
+
+/* Receive input */
+*RECV_INPUT
+	/* Move player */
+	getkey key_W, 'W'
+	getkey key_A, 'A'
+	getkey key_D, 'D'
+	if player_isjump == 0 {
+		if key_A { // left
+			player_t += 0.04
+		} else: if key_D { // right
+			player_t -= 0.04
+		}
+		if key_W { // forward
+			if player_animation != 1 {
+				gpact player_id, "run", 1
+				player_animation = 1
+			}
+			player_ismove = 1
+		} else {
+			player_ismove = 0
+			/* Change animation */
+			if player_animation == 1 {
+				if key_A == 0 && key_D == 0 {
+					gpact player_id, "stop", 1
+					player_animation = 0
+				} else {
+					gpact player_id, "walk", 1
+					player_animation = 2
+				}
+			} else {
+				if key_A == 0 && key_D == 0 {
+					if player_animation != 0 {
+						gpact player_id, "stop", 1
+						player_animation = 0
+					}
+				} else: if player_animation == 0 {
+					gpact player_id, "walk", 1
+					player_animation = 2
+				}
+			}
+		}
+	}
+
+	/* Jump player */
+	stick key, 16
+	if key & 16 {
+		if player_isjump == 0 {
+			gppapply player_foot_id, GPPAPPLY_IMPULSE, 0, 6, 0
+			gpact player_id, "jump", 1
+			player_isjump = 1
+		}
+	}
+	return
+
+/* Initialize stage */
+*INIT_STAGE
+	/* create floor */
+	gpfloor floor_id, 50, 10, 0x4080f0
+	setpos floor_id, 0.0, 0.0, -20.0
+	gppbind floor_id, 0, 0.8
+	gpfloor goal_id, 50, 10, 0x4080f0
+	setpos goal_id, 0.0, 0.0, 40.0
+	gppbind goal_id, 0, 0.8
+
+	/* load tamane model */
+	gpload player_id, "res/tamane"
+	setscale player_id, 0.01, 0.01, 0.01
+	// add animation / motion
+	gpaddanim player_id, "stop", 1000, 3000	; 1
+	gpaddanim player_id, "run", 5000, 5700	; 2
+	gpaddanim player_id, "walk", 4000, 4800	; 3
+	gpaddanim player_id, "jump", 140, 140	; 4
+	gpact player_id, "stop", 1
+
+	/* actual player */
+	gpbox player_foot_id, 2.0, 0xff0000
+	setscale player_foot_id, 0.8, 1.0,  0.8
+	setpos player_foot_id, player_x, 2.0, player_z
+	setcoli player_foot_id, GROUP_PLAYER, GROUP_FLOOR
+	gppbind player_foot_id, 1, 0.8
+	gppset player_foot_id, GPPSET_GRAVITY, 0.0, -9.8, 0.0
+	if is_debug {
+		setalpha player_foot_id, 50.0
+	} else {
+		setalpha player_foot_id, 0.0
+	}
+
+	/* Create maze */
+	dim maze_id, 10, 10
+	dim maze_phys_id, 10, 10
+	dim maze_solid, 10, 10
+	repeat 10
+		y = cnt
+		repeat 10
+			// visible box
+			gpbox maze_id(y, cnt), 4.8, 0xe07030 + rnd(0x10)*0x10000 + rnd(0x10)*0x100 + rnd(0x10)
+			setscale maze_id(y, cnt), 1.0, 0.1, 1.0
+			setcoli maze_id(y, cnt), GROUP_FLOOR
+			setpos maze_id(y, cnt), -22.0 + cnt * 5, -0.25, -12.0 + y * 5
+			// invisible floor
+			if rnd(3) == 0 {
+				maze_solid(y, cnt) = 1
+				gpfloor maze_phys_id(y, cnt), 4.8, 4.8, 0x00ff00
+				setpos maze_phys_id(y, cnt), -22.0 + cnt * 5, 0.0, -12.0 + y * 5
+				gppbind maze_phys_id(y, cnt), 0, 0.8
+				if is_debug {
+					setalpha maze_phys_id(y, cnt), 50.0
+				} else {
+					setalpha maze_phys_id(y, cnt), 0.0
+				}
+			}
+		loop
+	loop
+
+	return

@@ -1,0 +1,10 @@
+{
+    "name": "padrsa",
+    "description": "Textbook-RSA is sometimes weak. I padded it to improve the security.<br><pre>nc ${host} ${port}</pre>",
+    "flag": "KosenCTF{p13as3_mak4_padding_unpr3dictab13}",
+    "author": "theoremoon",
+    "tags": ["crypto", "lunatic"],
+    "host": "crypto.kosenctf.com",
+    "port": 13001,
+    "is_survey": false
+}

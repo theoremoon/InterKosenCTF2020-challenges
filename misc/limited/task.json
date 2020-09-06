@@ -1,0 +1,8 @@
+{
+    "name": "limited",
+    "description": "Our website had been attacked by someone. Did the attacker successfully steal the admin's secret?",
+    "flag": "KosenCTF{u_c4n_us3_CRT_f0r_LIMIT_1nj3ct10n_p01nt}",
+    "author": "theoremoon",
+    "tags": ["forensics", "web"],
+    "is_survey": false
+}

@@ -1,0 +1,6 @@
+version: '3'
+services:
+  padding_oracle:
+    build: ./
+    ports:
+      - 13004:13004

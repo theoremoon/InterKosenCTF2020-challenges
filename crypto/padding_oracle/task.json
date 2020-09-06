@@ -1,0 +1,10 @@
+{
+    "name": "padding oracle",
+    "description": "As you know, AES-CBC is vulnerable to the oracle attack by padding. Today I resolved the security issue.<br><pre>nc ${host} ${port}</pre>",
+    "flag": "KosenCTF{0r4c13_5urviv35_57i11_n0w}",
+    "author": "theoremoon",
+    "tags": ["crypto"],
+    "host": "padding-oracle.kosenctf.com",
+    "port": 13004,
+    "is_survey": false
+}

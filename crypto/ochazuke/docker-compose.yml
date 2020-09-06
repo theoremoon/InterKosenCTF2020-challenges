@@ -1,0 +1,6 @@
+version: '3'
+services:
+  ochazuke:
+    build: ./
+    ports:
+      - 13005:13005

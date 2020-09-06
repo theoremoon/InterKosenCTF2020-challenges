@@ -1,0 +1,10 @@
+{
+    "name": "readme",
+    "description": "<pre>nc ${host} ${port}</pre>",
+    "flag": "KosenCTF{fd_1s_l1nk3d_2_7h3_4c7u4l_f1l3p4th}",
+    "author": "ptr-yudai",
+    "tags": ["misc"],
+    "host": "misc.kosenctf.com",
+    "port": 9712,
+    "is_survey": false
+}

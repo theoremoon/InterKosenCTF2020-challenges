@@ -1,0 +1,10 @@
+{
+    "name": "No pressure",
+    "description": "<pre>nc ${host} ${port}</pre>",
+    "flag": "KosenCTF{DEFLATE_is_an_algorithm_that_combines_LZ77_and_Huffman_coding}",
+    "author": "yoshiking",
+    "tags": ["misc", "warmup"],
+    "host": "misc.kosenctf.com",
+    "port": 10002,
+    "is_survey": false
+}

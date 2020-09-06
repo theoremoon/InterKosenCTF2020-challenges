@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Graphviz++ @InterKosenCTF</title>
+        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css">
+        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/grids-responsive-min.css">
+        <style>
+         .pure-g [class*="pure-u"] {
+             font-family: Consolas, "Courier New", Courier, Monaco, monospace;
+             font-size: 16px;
+         }
+         textarea {
+             font-family: inherit;
+             font-size: inherit;
+         }
+         .error-message {
+             background-color: #fce4e4;
+             border: 1px solid #fcc2c3;
+             float: left;
+             padding: 16px 24px;
+             margin: 8px;
+         }
+         .error-text {
+             color: #cc0033;
+             font-family: Helvetica, Arial, sans-serif;
+             font-size: 16px;
+             font-weight: bold;
+             line-height: 20px;
+             text-shadow: 1px 1px rgba(250,250,250,.3);
+         }
+        </style>
+    </head>
+    <body>
+        <div style="margin: 0 1% 0 1%;">
+            <h1>Graphviz++</h1>
+            <p>Merge 2 graphs!</p>
+            {% if r %}
+            <h3>Result:</h3>
+            {{ r|safe }}
+            {% endif %}
+            <form class="pure-form pure-form-stacked" style="margin-bottom: 32px;" method="POST" action="/">
+                <fieldset class="pure-group">
+                    <legend>Enter graphs (dot language)</legend>
+                    {% if e %}
+                    <div class="pure-g">
+                        <div class="pure-u-1-2 error-message">
+                            <span class="error-text">{{e}}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="pure-g">
+                        <div class="pure-u-1 pure-u-md-1-2">
+                            <textarea class="pure-u-23-24" placeholder="Graph 1" name="g1" rows="16">{{ g1 }}</textarea>
+                        </div>
+                        <div class="pure-u-1 pure-u-md-1-2">
+                            <textarea class="pure-u-23-24" placeholder="Graph 2" name="g2" rows="16">{{ g2 }}</textarea>
+                        </div>
+                    </div>
+                </fieldset>
+                <button type="submit" class="pure-button pure-button-primary pure-input-1">Merge</button>
+            </form>
+        </div>
+    </body>
+</html>

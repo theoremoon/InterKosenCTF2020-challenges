@@ -1,0 +1,10 @@
+{
+    "name": "confusing",
+    "description": "<p>Mimicked WebKit :P</p><br><pre>nc ${host} ${port}</pre>",
+    "flag": "KosenCTF{add_0x2000000000000_to_double_precision_values}",
+    "author": "ptr-yudai",
+    "tags": ["pwn", "lunatic"],
+    "host": "pwn.kosenctf.com",
+    "port": 9005,
+    "is_survey": false
+}

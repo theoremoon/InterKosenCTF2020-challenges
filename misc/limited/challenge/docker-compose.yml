@@ -1,0 +1,9 @@
+version: '3'
+services:
+  limited:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./public:/var/www/html
+

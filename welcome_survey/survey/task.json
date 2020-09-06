@@ -1,0 +1,8 @@
+{
+    "name": "Survey",
+    "description": "Please give us your feedback <a href=\"https://forms.gle/Gb6ak47VYf8sAABK6\" target=\"_blank\">here</a>.",
+    "flag": "KosenCTF{w4s_th1s_ch4ll3ng3_h4rd_4_u?}",
+    "author": "insecure",
+    "tags": ["survey"],
+    "is_survey": true
+}
